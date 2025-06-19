@@ -1,4 +1,14 @@
-<?php include 'header.php'; ?>
+<?php
+session_start();
+
+// Cek apakah admin sudah login. Jika belum, redirect ke halaman login.
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header('Location: login.php?error=unauthorized');
+    exit; 
+}
+
+include 'header.php'; 
+?>
 
 <main class="container-fluid">
     <h3 class="text-center mt-3 mb-4">Manajemen Pengguna</h3>

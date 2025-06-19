@@ -8,20 +8,18 @@
 	$conn = new mysqli($servername, $username, $password, $dbname);
 
 	// Create database
-	$sql = "CREATE DATABASE biometricattendace";
+	$sql = "CREATE DATABASE IF NOT EXISTS biometricattendace";
 	if ($conn->query($sql) === TRUE) {
-	    echo "Database created successfully";
+	    echo "Database 'biometricattendace' checked/created successfully.<br>";
 	} else {
-	    echo "Error creating database: " . $conn->error;
+	    echo "Error creating database: " . $conn->error . "<br>";
 	}
-
-	echo "<br>";
 
 	$dbname = "biometricattendace";
     
 	$conn = new mysqli($servername, $username, $password, $dbname);
 
-	// sql to create table
+	// sql to create table users
 	$sql = "CREATE TABLE IF NOT EXISTS `users` (
 			`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			`username` varchar(100) NOT NULL,
@@ -37,11 +35,12 @@
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 
 	if ($conn->query($sql) === TRUE) {
-	    echo "Table users created successfully";
+	    echo "Table 'users' checked/created successfully.<br>";
 	} else {
-	    echo "Error creating table: " . $conn->error;
+	    echo "Error creating table 'users': " . $conn->error . "<br>";
 	}
 
+	// sql to create table users_logs
 	$sql = "CREATE TABLE IF NOT EXISTS `users_logs` (
 			`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			`username` varchar(100) NOT NULL,
@@ -53,10 +52,40 @@
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 
 	if ($conn->query($sql) === TRUE) {
-	    echo "Table users_logs created successfully";
+	    echo "Table 'users_logs' checked/created successfully.<br>";
 	} else {
-	    echo "Error creating table: " . $conn->error;
+	    echo "Error creating table 'users_logs': " . $conn->error . "<br>";
 	}
+    
+    // sql to create table admin
+    $sql = "CREATE TABLE IF NOT EXISTS `admin` (
+            `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `username` varchar(50) NOT NULL UNIQUE,
+            `password` varchar(255) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
+
+    if ($conn->query($sql) === TRUE) {
+	    echo "Table 'admin' checked/created successfully.<br>";
+	} else {
+	    echo "Error creating table 'admin': " . $conn->error . "<br>";
+	}
+
+    // Check if default admin exists, if not, insert it
+    $sql = "SELECT id FROM admin WHERE username='admin'";
+    $result = $conn->query($sql);
+    if ($result->num_rows == 0) {
+        $admin_user = 'admin';
+        $admin_pass = password_hash('password123', PASSWORD_DEFAULT); // Hash the default password
+        
+        $sql = "INSERT INTO admin (username, password) VALUES ('$admin_user', '$admin_pass')";
+        if ($conn->query($sql) === TRUE) {
+            echo "Default admin user created successfully. User: admin, Pass: password123<br>";
+        } else {
+            echo "Error creating default admin: " . $conn->error . "<br>";
+        }
+    } else {
+        echo "Default admin user already exists.<br>";
+    }
 		
 	$conn->close();
 ?>
