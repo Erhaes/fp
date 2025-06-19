@@ -1,5 +1,7 @@
 <?php 
-session_start();
+// session_start();
+// Baris di atas sudah ada di file-file utama, jadi tidak perlu dipanggil lagi di sini untuk menghindari error.
+// Namun, kita tetap membutuhkan akses ke variabel $_SESSION
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -60,16 +62,32 @@ session_start();
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a class="nav-link" href="index.php"><i class="fa fa-users"></i> Users</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="UsersLog.php"><i class="fa fa-book"></i> Users Log</a>
             </li>
+            <?php if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true): ?>
             <li class="nav-item">
                 <a class="nav-link" href="ManageUsers.php"><i class="fa fa-user-plus"></i> Manage Users</a>
             </li>
+            <?php endif; ?>
+        </ul>
+        <ul class="navbar-nav">
+            <?php if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true): ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fa fa-user"></i> Halo, <?php echo htmlspecialchars($_SESSION['admin_username']); ?></a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link" href="logout.php"><i class="fa fa-sign-out"></i> Logout</a>
+                </li>
+            <?php else: ?>
+                 <li class="nav-item">
+                    <a class="nav-link" href="login.php"><i class="fa fa-sign-in"></i> Admin Login</a>
+                </li>
+            <?php endif; ?>
         </ul>
     </div>
 </nav>
