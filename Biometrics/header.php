@@ -26,9 +26,32 @@ session_start();
         main {
             padding-top: 20px;
         }
+        /* Styling untuk notifikasi Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
     </style>
 </head>
 <body>
+
+<div aria-live="polite" aria-atomic="true" class="toast-container">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+        <div class="toast-header">
+            <strong class="mr-auto" id="toast-title"></strong>
+            <small>Baru saja</small>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="toast-body" id="toast-body">
+        </div>
+    </div>
+</div>
+
+
 <nav class="navbar navbar-expand-lg navbar-dark">
     <a class="navbar-brand" href="index.php">
         <i class="fa fa-cogs"></i> Biometric Attendance
@@ -53,3 +76,41 @@ session_start();
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    let lastLogId = 0;
+
+    // 1. Dapatkan ID log terakhir saat halaman dimuat
+    $.get('get_last_log_id.php', function(data) {
+        lastLogId = parseInt(data) || 0;
+    });
+
+    // 2. Cek log baru setiap 5 detik
+    setInterval(function() {
+        $.ajax({
+            url: 'check_new_log.php',
+            type: 'GET',
+            data: { last_id: lastLogId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    // Update ID terakhir yang diketahui
+                    lastLogId = parseInt(response.new_id);
+                    
+                    // Siapkan dan tampilkan notifikasi
+                    let action_icon = response.action === 'Login' ? '<i class="fa fa-sign-in text-success"></i>' : '<i class="fa fa-sign-out text-danger"></i>';
+                    
+                    $('#toast-title').html(action_icon + ' Aktivitas Baru: ' + response.action);
+                    $('#toast-body').text(response.username + ' berhasil melakukan ' + response.action.toLowerCase() + ' pada pukul ' + response.time + '.');
+                    
+                    $('#notificationToast').toast('show');
+                }
+            },
+            error: function() {
+                // Diamkan jika ada error, untuk menghindari console spam
+            }
+        });
+    }, 5000); 
+});
+</script>
